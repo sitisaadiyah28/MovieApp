@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:video_database/HororPage.dart';
-import 'package:video_database/IslamicPage.dart';
+import 'package:video_database/network/NetworkProvider.dart';
+import 'package:video_database/ui/ItemList.dart';
+
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  BaseEndPoint network = NetworkProvider();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,10 +35,29 @@ class MyApp extends StatelessWidget {
               ],
             ),
           ),
+          backgroundColor: Colors.black,
           body: TabBarView(
             children: <Widget>[
-              IslamicPage(),
-              HororPage(),
+              new FutureBuilder(
+                  future: network.getMovieById("1"),
+                  builder: (context, result) {
+                    if (result.hasError) print(result.error);
+                    return result.hasData
+                        ? ItemList(list: result.data)
+                        : Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }),
+              new FutureBuilder(
+                  future: network.getMovieById("2"),
+                  builder: (context, result) {
+                    if (result.hasError) print(result.error);
+                    return result.hasData
+                        ? ItemList(list: result.data)
+                        : Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }),
             ],
           ),
         ),
@@ -39,3 +65,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
